@@ -29,3 +29,6 @@ class ParentNode(HTMLNode):
             return ""
         result = self.__children_to_html(children[1:])
         return children[0].to_html() + result
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
