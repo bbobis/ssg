@@ -15,5 +15,6 @@ class LeafNode(HTMLNode):
             raise ValueError()
         if not self.tag:
             return self.value
-        props = "test" if self.props_to_html() == "" else " "
-        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        props = self.props_to_html()
+        props = props if props == "" else f" {props}"
+        return f"<{self.tag}{props}>{self.value}</{self.tag}>"
