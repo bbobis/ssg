@@ -1,6 +1,12 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode, text_node_to_html_node
+from htmlnode import (
+    HTMLNode,
+    LeafNode,
+    ParentNode,
+    split_nodes_delimiter,
+    text_node_to_html_node,
+)
 from textnode import TextNode, TextType
 
 
@@ -162,4 +168,158 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         self.assertEqual(
             html_node.to_html(),
             '<img src="./asserts/img.jpg" alt="Some Image"></img>',
+        )
+
+
+class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_with_backticks_for_code(self):
+        node = TextNode(
+            "This is text with a `code block`",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode(
+                    "This is text with a ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "code block",
+                    TextType.CODE,
+                ),
+            ],
+        )
+
+    def test_with_star_for_italic(self):
+        node = TextNode(
+            "This is text with an *italic word*",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_delimiter([node], "*", TextType.ITALIC)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode(
+                    "This is text with an ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "italic word",
+                    TextType.ITALIC,
+                ),
+            ],
+        )
+
+    def test_with_double_star_for_bold(self):
+        node = TextNode(
+            "This is text with a **bolded word**",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode(
+                    "This is text with a ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "bolded word",
+                    TextType.BOLD,
+                ),
+            ],
+        )
+
+    def test_with_backticks_star_double_star(self):
+        new_nodes = [
+            TextNode(
+                "This is text with a **bolded word**, a text with *italic word*, and a text with `code block` in one sentence",
+                TextType.NORMAL,
+            )
+        ]
+        new_nodes = split_nodes_delimiter(new_nodes, "`", TextType.CODE)
+        new_nodes = split_nodes_delimiter(new_nodes, "*", TextType.ITALIC)
+        new_nodes = split_nodes_delimiter(new_nodes, "**", TextType.BOLD)
+
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode(
+                    "This is text with a ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "bolded word",
+                    TextType.BOLD,
+                ),
+                TextNode(
+                    ", a text with ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "italic word",
+                    TextType.ITALIC,
+                ),
+                TextNode(
+                    ", and a text with ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "code block",
+                    TextType.CODE,
+                ),
+                TextNode(
+                    " in one sentence",
+                    TextType.NORMAL,
+                ),
+            ],
+        )
+
+    def test_with_no_ending_delimiter(self):
+        node = TextNode(
+            "This is *text* with a **bolded word?",
+            TextType.NORMAL,
+        )
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode(
+                    "This is *text* with a **bolded word?",
+                    TextType.NORMAL,
+                ),
+            ],
+        )
+
+    def test_with_italic_in_bold(self):
+        nodes = [
+            TextNode(
+                "This is *an italic text with a **bolded word** in a sentence*",
+                TextType.NORMAL,
+            )
+        ]
+        nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+        nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+        self.assertListEqual(
+            nodes,
+            [
+                TextNode(
+                    "This is ",
+                    TextType.NORMAL,
+                ),
+                TextNode(
+                    "an italic text with a ",
+                    TextType.ITALIC,
+                ),
+                TextNode(
+                    "bolded word",
+                    TextType.BOLD,
+                ),
+                TextNode(
+                    " in a sentence",
+                    TextType.ITALIC,
+                ),
+            ],
         )

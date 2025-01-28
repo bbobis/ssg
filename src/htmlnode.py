@@ -91,3 +91,86 @@ def text_node_to_html_node(text_node: TextNode):
             return LeafNode("a", text_node.text, {"href": text_node.url})
         case TextType.IMAGE:
             return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
+
+
+double_star_delimiter_substitute = "[9fe2c4e9-3f65-4fdb-b24c-02b15259716c]"
+
+
+def replace_double_star(text: str):
+    return text.replace("**", double_star_delimiter_substitute)
+
+
+def undo_replace_double_star(text: str):
+    return text.replace(double_star_delimiter_substitute, "**")
+
+
+def split_nodes_delimiter(
+    old_nodes: List["TextNode"], delimiter: str, text_type: TextType
+):
+    new_nodes = []
+    for node in old_nodes:
+        node_text = node.text
+        double_star_replaced = False
+
+        if delimiter == "*":
+            # temporarily substitute "**"" with [double_star_delimiter_substitute] to avoid false positive matches with "*"
+            node_text = replace_double_star(node_text)
+            double_star_replaced = True
+
+        # search for the 1st instance of the delimiter
+        starting_delimiter_idx = node_text.find(delimiter)
+
+        if starting_delimiter_idx == -1:
+            # Can't process node for the given delimiter, move one.
+            new_nodes.append(node)
+            continue
+
+        # search for the 2nd instance of the delimiter
+        ending_delimiter_search_from_idx = starting_delimiter_idx + len(delimiter)
+        ending_delimiter_idx = node_text.find(
+            delimiter, ending_delimiter_search_from_idx
+        )
+
+        if ending_delimiter_idx == -1:
+            starting_node = 0
+            if len(new_nodes) != 0:
+                last_node_text = new_nodes[-1].text
+                starting_node = node_text.find(last_node_text) + (len(last_node_text))
+            new_nodes.append(TextNode(node_text[starting_node:], node.text_type))
+            continue
+
+        # Found a valid delimited text, check if preceding text exists and create a node
+        preceding_text = node_text[:starting_delimiter_idx]
+        if len(preceding_text) > 0:
+            final = (
+                undo_replace_double_star(preceding_text)
+                if double_star_replaced
+                else preceding_text
+            )
+            new_nodes.append(TextNode(final, node.text_type))
+
+        # slice the delimited text and create a new text node
+        delimited_text_start_idx = starting_delimiter_idx + len(delimiter)
+        delimited_text = node_text[delimited_text_start_idx:ending_delimiter_idx]
+        if len(delimited_text) > 0:
+            final = (
+                undo_replace_double_star(delimited_text)
+                if double_star_replaced
+                else delimited_text
+            )
+            new_nodes.append(TextNode(final, text_type))
+
+        # Recursively call if there are more text
+        succeeding_text_start_idx = ending_delimiter_idx + len(delimiter)
+        succeeding_text = node_text[succeeding_text_start_idx:]
+        if len(succeeding_text) > 0:
+            final = (
+                undo_replace_double_star(succeeding_text)
+                if double_star_replaced
+                else succeeding_text
+            )
+            new_nodes += split_nodes_delimiter(
+                [TextNode(final, node.text_type)], delimiter, text_type
+            )
+
+    return new_nodes
