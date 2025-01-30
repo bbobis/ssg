@@ -1,3 +1,4 @@
+import re
 from typing import Any, Dict, List
 
 from textnode import TextNode, TextType
@@ -174,3 +175,8 @@ def split_nodes_delimiter(
             )
 
     return new_nodes
+
+
+def extract_markdown_images(text: str):
+    # Markdown image has the following syntax ![Alt Text](url)
+    return re.findall(r"\!\[(.*?)\]\((http.*?)\)", text)

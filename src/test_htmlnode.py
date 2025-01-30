@@ -4,6 +4,7 @@ from htmlnode import (
     HTMLNode,
     LeafNode,
     ParentNode,
+    extract_markdown_images,
     split_nodes_delimiter,
     text_node_to_html_node,
 )
@@ -322,4 +323,25 @@ class TestSplitNodesDelimiter(unittest.TestCase):
                     TextType.ITALIC,
                 ),
             ],
+        )
+
+
+class TestExtractMarkdownImages(unittest.TestCase):
+    def test_extracting_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
+        )
+
+    def test_extracting_markdown_images_non_image_format(self):
+        text = "This is text with a non ![image link] format (https://i.imgur.com/aKaOqIh.gif)"
+        images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            [],
         )
