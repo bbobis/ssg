@@ -185,21 +185,31 @@ def split_nodes_link(old_nodes: List["TextNode"]):
     return split_nodes_image_or_link(old_nodes, TextType.LINK)
 
 
+def extract_markdown_images(text: str):
+    # Markdown image has the following syntax ![Alt Text](url)
+    return re.findall(r"\!\[(.*?)\]\((http.*?)\)", text)
+
+
+def extract_markdown_links(text: str):
+    # Markdown link has the following syntax [Link Text](url)
+    return re.findall(r"\[(.*?)\]\((http.*?)\)", text)
+
+
 def split_nodes_image_or_link(old_nodes: List["TextNode"], text_type: TextType):
     if text_type not in [TextType.IMAGE, TextType.LINK]:
         raise ValueError("Invalid text type")
 
     new_nodes = []
 
-    extractor = {
-        TextType.IMAGE: extract_markdown_images,
-        TextType.LINK: extract_markdown_links,
-    }[text_type]
+    extractor = (
+        extract_markdown_images
+        if text_type == TextType.IMAGE
+        else extract_markdown_links
+    )
 
-    formatter = {
-        TextType.IMAGE: lambda text, url: f"![{text}]({url})",
-        TextType.LINK: lambda text, url: f"[{text}]({url})",
-    }[text_type]
+    def formatter(text, url):
+        formatted = f"[{text}]({url})"
+        return formatted if text_type == TextType.LINK else "!" + formatted
 
     for node in old_nodes:
         if node.text_type != TextType.NORMAL:
@@ -240,11 +250,11 @@ def split_nodes_image_or_link(old_nodes: List["TextNode"], text_type: TextType):
     return new_nodes
 
 
-def extract_markdown_images(text: str):
-    # Markdown image has the following syntax ![Alt Text](url)
-    return re.findall(r"\!\[(.*?)\]\((http.*?)\)", text)
-
-
-def extract_markdown_links(text: str):
-    # Markdown link has the following syntax [Link Text](url)
-    return re.findall(r"\[(.*?)\]\((http.*?)\)", text)
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.NORMAL)]
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
