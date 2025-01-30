@@ -6,6 +6,7 @@ from htmlnode import (
     ParentNode,
     extract_markdown_images,
     extract_markdown_links,
+    markdown_to_block,
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
@@ -553,5 +554,28 @@ class TestTextToTextnodes(unittest.TestCase):
                 ),
                 TextNode(" and a ", TextType.NORMAL),
                 TextNode("link", TextType.LINK, "https://google.com"),
+            ],
+        )
+
+
+class TestMarkdownToBlock(unittest.TestCase):
+    def test_markdown_to_block(self):
+        markdown = """
+        # This is a heading
+
+        This is a paragraph of text. It has some **bold** and *italic* words inside of it.
+
+        * This is the first list item in a list block
+        * This is a list item
+        * This is another list item
+        """
+        blocks = markdown_to_block(markdown)
+        print(blocks)
+        self.assertListEqual(
+            blocks,
+            [
+                "# This is a heading",
+                "This is a paragraph of text. It has some **bold** and *italic* words inside of it.",
+                "* This is the first list item in a list block\n* This is a list item\n* This is another list item",
             ],
         )
