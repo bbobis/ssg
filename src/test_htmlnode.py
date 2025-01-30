@@ -5,6 +5,7 @@ from htmlnode import (
     LeafNode,
     ParentNode,
     extract_markdown_images,
+    extract_markdown_links,
     split_nodes_delimiter,
     text_node_to_html_node,
 )
@@ -341,6 +342,22 @@ class TestExtractMarkdownImages(unittest.TestCase):
     def test_extracting_markdown_images_non_image_format(self):
         text = "This is text with a non ![image link] format (https://i.imgur.com/aKaOqIh.gif)"
         images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            [],
+        )
+
+    def test_extracting_markdown_links(self):
+        text = "This is text with a 2 links going to [google](https://google.com) and to [youtube](https://youtube.com) in one sentence"
+        images = extract_markdown_links(text)
+        self.assertListEqual(
+            images,
+            [("google", "https://google.com"), ("youtube", "https://youtube.com")],
+        )
+
+    def test_extracting_non_markdown_links(self):
+        text = "This is text with a link to [google] that is invalid (https://i.imgur.com/aKaOqIh.gif)"
+        images = extract_markdown_links(text)
         self.assertListEqual(
             images,
             [],

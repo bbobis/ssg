@@ -180,3 +180,8 @@ def split_nodes_delimiter(
 def extract_markdown_images(text: str):
     # Markdown image has the following syntax ![Alt Text](url)
     return re.findall(r"\!\[(.*?)\]\((http.*?)\)", text)
+
+
+def extract_markdown_links(text: str):
+    # Markdown image has the following syntax ![Alt Text](url)
+    return re.findall(r"\[(.*?)\]\((http.*?)\)", text)
