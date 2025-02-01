@@ -6,7 +6,7 @@ from inline_node_util import (
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
-    text_to_textnodes,
+    text_to_text_nodes,
 )
 from textnode import TextNode, TextType
 
@@ -372,7 +372,7 @@ class TestSplitNodesLink(unittest.TestCase):
 class TestTextToTextnodes(unittest.TestCase):
     def test_contains_everything(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://google.com)"
-        nodes = text_to_textnodes(text)
+        nodes = text_to_text_nodes(text)
         self.assertListEqual(
             nodes,
             [

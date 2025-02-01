@@ -16,7 +16,7 @@ def undo_replace_double_star(text: str):
 
 def split_nodes_delimiter(
     old_nodes: List["TextNode"], delimiter: str, text_type: TextType
-):
+) -> List["TextNode"]:
     new_nodes = []
     for node in old_nodes:
         node_text = node.text
@@ -86,11 +86,11 @@ def split_nodes_delimiter(
     return new_nodes
 
 
-def split_nodes_image(old_nodes: List["TextNode"]):
+def split_nodes_image(old_nodes: List["TextNode"]) -> List["TextNode"]:
     return split_nodes_image_or_link(old_nodes, TextType.IMAGE)
 
 
-def split_nodes_link(old_nodes: List["TextNode"]):
+def split_nodes_link(old_nodes: List["TextNode"]) -> List["TextNode"]:
     return split_nodes_image_or_link(old_nodes, TextType.LINK)
 
 
@@ -159,7 +159,7 @@ def split_nodes_image_or_link(old_nodes: List["TextNode"], text_type: TextType):
     return new_nodes
 
 
-def text_to_textnodes(text):
+def text_to_text_nodes(text) -> List["TextNode"]:
     nodes = [TextNode(text, TextType.NORMAL)]
     nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
     nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
