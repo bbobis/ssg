@@ -2,12 +2,12 @@ import os
 import shutil
 from typing import List
 
-from markdown_util import generate_page
+from markdown_util import generate_pages_recursive
 
 
 def main():
-    public_dir_path = os.path.join("public")
     static_dir_path = os.path.join("static")
+    public_dir_path = os.path.join("public")
 
     if os.path.exists(public_dir_path):
         print("Deleting public dir")
@@ -19,9 +19,8 @@ def main():
     copy_files(static_dir_path, public_dir_path, os.listdir(static_dir_path))
 
     template_path = os.path.join("template.html")
-    index_md_path = os.path.join("content", "index.md")
-    index_html_path = os.path.join("public", "index.html")
-    generate_page(index_md_path, template_path, index_html_path)
+    content_path = os.path.join("content")
+    generate_pages_recursive(content_path, template_path, public_dir_path)
 
 
 def copy_files(curr_src_path: str, curr_dest_path: str, items: List["str"]) -> None:
