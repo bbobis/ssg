@@ -96,12 +96,12 @@ def split_nodes_link(old_nodes: List["TextNode"]) -> List["TextNode"]:
 
 def extract_markdown_images(text: str):
     # Markdown image has the following syntax ![Alt Text](url)
-    return re.findall(r"\!\[(.*?)\]\((http.*?)\)", text)
+    return re.findall(r"\!\[(.*?)\]\((.*?)\)", text)
 
 
 def extract_markdown_links(text: str):
     # Markdown link has the following syntax [Link Text](url)
-    return re.findall(r"\[(.*?)\]\((http.*?)\)", text)
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
 
 
 def split_nodes_image_or_link(old_nodes: List["TextNode"], text_type: TextType):

@@ -2,6 +2,8 @@ import os
 import shutil
 from typing import List
 
+from markdown_util import generate_page
+
 
 def main():
     public_dir_path = os.path.join("public")
@@ -15,6 +17,11 @@ def main():
     print("Created public dir")
 
     copy_files(static_dir_path, public_dir_path, os.listdir(static_dir_path))
+
+    template_path = os.path.join("template.html")
+    index_md_path = os.path.join("content", "index.md")
+    index_html_path = os.path.join("public", "index.html")
+    generate_page(index_md_path, template_path, index_html_path)
 
 
 def copy_files(curr_src_path: str, curr_dest_path: str, items: List["str"]) -> None:

@@ -100,16 +100,6 @@ def text_node_to_html_node(text_node: TextNode):
 
 
 def markdown_to_html_node(markdown: str):
-    # Given a markdown document:
-    # 1. Get all the list of blocks -> markdown_to_block(str)
-    # 2. For each block, determine its type
-    # 3. Create a ParentNode with a tag corresponding the type
-    # 4. Determine if a block type has children.
-    # 4.1. For each children, create TextNodes -> text_to_textnodes(str)
-    # 4.2. For each text node create LeafNodes -> text_node_to_html_node(text_node)
-    # 5. Add the children of LeafNode to ParentNode
-    # 6. Add list of ParentNode to  div ParentNode
-
     children: List["HTMLNode"] = []
 
     blocks = markdown_to_block(markdown)
